@@ -74,8 +74,8 @@ Version 2.2 introduced the ability to upgrade pre-compiled firmware from a binar
 It is recommended to use Arduino IDE.  You will need to configure Arduino IDE to work with the Wemos board and USB port and installed the required USB drivers etc.  
 * USB CH340G drivers:  https://wiki.wemos.cc/downloads
 * Enter http://arduino.esp8266.com/stable/package_esp8266com_index.json into Additional Board Manager URLs field. You can add multiple URLs, separating them with commas.  This will add support for the Wemos D1 Mini to Arduino IDE.
-* Open Boards Manager from Tools > Board menu and install esp8266 platform (and don't forget to select your ESP8266 board from Tools > Board menu after installation).
-* Select Board:  "WeMos D1 R2 & mini"
+* Open Boards Manager from Tools > Board menu and install esp8266 Core platform version 2.5.2
+* Select Board:  "LOLIN(WEMOS) D1 R2 & mini"
 * Set 1M SPIFFS -- this project uses SPIFFS for saving and reading configuration settings.
 
 ## Loading Supporting Library Files in Arduino
@@ -117,6 +117,8 @@ used to open a browser to the Web Interface.  **Everything** can be configured t
 Please do not feel obligated, but donations and tips are warmly welcomed.  I have added the donation button at the request of a few people that wanted to contribute and show appreciation.  Thank you, and enjoy the application and project.  
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6VPMTLASLSKWE)
+
+Or -- you can buy me something from my Amazon Wishlist: https://www.amazon.com/hz/wishlist/ls/GINC2PHRNEY3  
 
 ## Contributors
 David Payne -- Principal developer and architect  
