@@ -36,6 +36,7 @@ private:
   int myPort = 80;
   String myApiKey = "";
   String encodedAuth = "";
+  String instance = "";
   boolean pollPsu;
   const String printerType = "OctoPrint";
 

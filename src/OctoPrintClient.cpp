@@ -31,6 +31,11 @@ OctoPrintClient::OctoPrintClient(String ApiKey, String server, int port, String 
 }
 
 void OctoPrintClient::updatePrintClient(String ApiKey, String server, int port, String user, String pass, boolean psu) {
+  int instance_pos = server.indexOf('/');
+  if (instance_pos >= 0) {
+    instance = server.substring(instance_pos);
+    server = server.substring(0, instance_pos);
+  }
   server.toCharArray(myServer, 100);
   myApiKey = ApiKey;
   myPort = port;
@@ -44,7 +49,6 @@ void OctoPrintClient::updatePrintClient(String ApiKey, String server, int port, 
 }
 
 boolean OctoPrintClient::validate() {
-  boolean rtnValue = false;
   printerData.error = "";
   if (String(myServer) == "") {
     printerData.error += "Server address is required; ";
@@ -52,10 +56,7 @@ boolean OctoPrintClient::validate() {
   if (myApiKey == "") {
     printerData.error += "ApiKey is required; ";
   }
-  if (printerData.error == "") {
-    rtnValue = true;
-  }
-  return rtnValue;
+  return printerData.error == "";
 }
 
 WiFiClient OctoPrintClient::getSubmitRequest(String apiGetData) {

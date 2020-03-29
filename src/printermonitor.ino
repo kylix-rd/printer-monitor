@@ -88,7 +88,7 @@ boolean displayOn = true;
 #if defined(USE_REPETIER_CLIENT)
   RepetierClient printerClient(PrinterApiKey, PrinterServer, PrinterPort, PrinterAuthUser, PrinterAuthPass, HAS_PSU);
 #else
-  OctoPrintClient printerClient(PrinterApiKey, PrinterServer, PrinterPort, PrinterAuthUser, PrinterAuthPass, HAS_PSU);
+  OctoPrintClient printerClient(PrinterApiKey, PrinterServer + PrinterInstance, PrinterPort, PrinterAuthUser, PrinterAuthPass, HAS_PSU);
 #endif
 int printerCount = 0;
 
@@ -468,6 +468,7 @@ void handleUpdateConfig() {
   PrinterApiKey = server.arg("PrinterApiKey");
   PrinterHostName = server.arg("PrinterHostName");
   PrinterServer = server.arg("PrinterAddress");
+  PrinterInstance = server.arg("PrinterInstance");
   PrinterPort = server.arg("PrinterPort").toInt();
   PrinterAuthUser = server.arg("octoUser");
   PrinterAuthPass = server.arg("octoPass");
@@ -572,11 +573,15 @@ void handleConfigure() {
                       "<p><label>" + printerClient.getPrinterType() + " API Key (get from your server)</label>"
                       "<input class='w3-input w3-border w3-margin-bottom' type='text' name='PrinterApiKey' id='PrinterApiKey' value='%OCTOKEY%' maxlength='60'></p>";
   if (printerClient.getPrinterType() == "OctoPrint") {
-    CHANGE_FORM +=      "<p><label>" + printerClient.getPrinterType() + " Host Name (usually octopi)</label><input class='w3-input w3-border w3-margin-bottom' type='text' name='PrinterHostName' value='%OCTOHOST%' maxlength='60'></p>";                        
+    CHANGE_FORM +=      "<p><label>" + printerClient.getPrinterType() + " Host Name (usually octopi)</label><input class='w3-input w3-border w3-margin-bottom' type='text' name='PrinterHostName' value='%OCTOHOST%' maxlength='60'></p>";
   }
   CHANGE_FORM +=      "<p><label>" + printerClient.getPrinterType() + " Address (do not include http://)</label>"
-                      "<input class='w3-input w3-border w3-margin-bottom' type='text' name='PrinterAddress' id='PrinterAddress' value='%OCTOADDRESS%' maxlength='60'></p>"
-                      "<p><label>" + printerClient.getPrinterType() + " Port</label>"
+                      "<input class='w3-input w3-border w3-margin-bottom' type='text' name='PrinterAddress' id='PrinterAddress' value='%OCTOADDRESS%' maxlength='60'></p>";
+  if (printerClient.getPrinterType() == "OctoPrint") {
+    CHANGE_FORM +=      "<p><label>" + printerClient.getPrinterType() + " Instance (usually left blank)</label>"
+                        "<input class='w3-input w3-border w3-margin-bottom' type='text' name='PrinterInstance' id='PrinterInstance' value='%OCTOINSTANCE%' maxlength='60'></p>";
+  }
+  CHANGE_FORM +=      "<p><label>" + printerClient.getPrinterType() + " Port</label>"
                       "<input class='w3-input w3-border w3-margin-bottom' type='text' name='PrinterPort' id='PrinterPort' value='%OCTOPORT%' maxlength='5'  onkeypress='return isNumberKey(event)'></p>";
   if (printerClient.getPrinterType() == "Repetier") {
     CHANGE_FORM +=    "<input type='button' value='Test Connection' onclick='testRepetier()'>"
@@ -605,8 +610,8 @@ void handleConfigure() {
     server.sendContent(html);
   } else {
     html = "<script>function testOctoPrint(){var e=document.getElementById(\"OctoPrintTest\"),t=document.getElementById(\"PrinterAddress\").value,"
-           "n=document.getElementById(\"PrinterPort\").value;if(e.innerHTML=\"\",\"\"==t||\"\"==n)return e.innerHTML=\"* Address and Port are required\","
-           "void(e.style.background=\"\");var r=\"http://\"+t+\":\"+n;r+=\"/api/job?apikey=\"+document.getElementById(\"PrinterApiKey\").value,window.open(r,\"_blank\").focus()}</script>";
+           "n=document.getElementById(\"PrinterPort\").value;pi=document.getElementById(\"PrinterInstance\").value;if(e.innerHTML=\"\",\"\"==t||\"\"==n)return e.innerHTML=\"* Address and Port are required\","
+           "void(e.style.background=\"\");var r=\"http://\"+t+\":\"+n;r+=pi+\"/api/job?apikey=\"+document.getElementById(\"PrinterApiKey\").value,window.open(r,\"_blank\").focus()}</script>";
     server.sendContent(html);
   }
   
@@ -615,6 +620,7 @@ void handleConfigure() {
   form.replace("%OCTOKEY%", PrinterApiKey);
   form.replace("%OCTOHOST%", PrinterHostName);
   form.replace("%OCTOADDRESS%", PrinterServer);
+  form.replace("%OCTOINSTANCE%", PrinterInstance);
   form.replace("%OCTOPORT%", String(PrinterPort));
   form.replace("%OCTOUSER%", PrinterAuthUser);
   form.replace("%OCTOPASS%", PrinterAuthPass);
@@ -1124,6 +1130,7 @@ void writeSettings() {
     f.println("printerApiKey=" + PrinterApiKey);
     f.println("printerHostName=" + PrinterHostName);
     f.println("printerServer=" + PrinterServer);
+    f.println("printerInstance=" + PrinterInstance);
     f.println("printerPort=" + String(PrinterPort));
     f.println("printerName=" + printerClient.getPrinterName());
     f.println("printerAuthUser=" + PrinterAuthUser);
@@ -1178,6 +1185,11 @@ void readSettings() {
       PrinterServer = line.substring(line.lastIndexOf("printerServer=") + 14);
       PrinterServer.trim();
       Serial.println("PrinterServer=" + PrinterServer);
+    }
+    if (line.indexOf("printerInstance=") >= 0) {
+      PrinterInstance = line.substring(line.lastIndexOf("printerInstance=") + 16);
+      PrinterInstance.trim();
+      Serial.println("PrinterInstance=" + PrinterInstance);
     }
     if (line.indexOf("printerPort=") >= 0) {
       PrinterPort = line.substring(line.lastIndexOf("printerPort=") + 12).toInt();
@@ -1268,7 +1280,7 @@ void readSettings() {
     }
   }
   fr.close();
-  printerClient.updatePrintClient(PrinterApiKey, PrinterServer, PrinterPort, PrinterAuthUser, PrinterAuthPass, HAS_PSU);
+  printerClient.updatePrintClient(PrinterApiKey, PrinterServer + PrinterInstance, PrinterPort, PrinterAuthUser, PrinterAuthPass, HAS_PSU);
   weatherClient.updateWeatherApiKey(WeatherApiKey);
   weatherClient.updateLanguage(WeatherLanguage);
   weatherClient.setMetric(IS_METRIC);

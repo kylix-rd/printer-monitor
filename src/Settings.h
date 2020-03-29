@@ -63,6 +63,7 @@ SOFTWARE.
 String PrinterApiKey = "";   // ApiKey from your User Account on OctoPrint / Repetier
 String PrinterHostName = "octopi";// Default 'octopi' -- or hostname if different (optional if your IP changes)
 String PrinterServer = "";   // IP or Address of your OctoPrint / Repetier Server (DO NOT include http://)
+String PrinterInstance = "";   // haproxy server instance for multi-instance installs
 int PrinterPort = 80;        // the port you are running your OctoPrint / Repetier server on (usually 80);
 String PrinterAuthUser = "";      // only used if you have haproxy or basic athentintication turned on (not default)
 String PrinterAuthPass = "";      // only used with haproxy or basic auth (only needed if you must authenticate)
